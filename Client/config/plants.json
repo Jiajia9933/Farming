@@ -1,0 +1,10 @@
+{
+  "carrot": {
+    "id": "carrot",
+    "name": "胡萝卜",
+    "buyPrice": 20,
+    "sellPrice": 30,
+    "matureSeconds": 300,
+    "exp": 5
+  }
+}

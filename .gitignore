@@ -7,6 +7,13 @@ build/
 project.private.config.json
 .wxproj/
 
+# Client 的 TypeScript 编译产物（tsc 直接输出到 Client 根目录，源码在 Client/src）
+Client/game.js
+Client/core/
+Client/entities/
+Client/ui/
+Client/scenes/
+
 # 系统文件
 .DS_Store
 Thumbs.db

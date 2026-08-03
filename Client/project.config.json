@@ -1,0 +1,19 @@
+{
+  "description": "GreenFarm 微信小游戏项目配置",
+  "packOptions": {
+    "ignore": [],
+    "include": []
+  },
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "postcss": false,
+    "minified": false,
+    "bigPackageSizeSupport": true
+  },
+  "compileType": "game",
+  "libVersion": "3.0.0",
+  "appid": "touristappid",
+  "projectname": "GreenFarm",
+  "condition": {}
+}

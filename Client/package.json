@@ -1,0 +1,13 @@
+{
+  "name": "greenfarm-client",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GreenFarm 微信小游戏客户端",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  }
+}
