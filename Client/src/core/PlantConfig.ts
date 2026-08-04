@@ -11,6 +11,8 @@ export interface PlantDef {
   sproutIcon: string;
   /** 半成熟阶段的图标，同样每种作物不一样。 */
   growingIcon: string;
+  /** 玩家等级低于这个值时不能种这个作物。 */
+  requiredLevel: number;
   buyPrice: number;
   sellPrice: number;
   matureSeconds: number;

@@ -139,7 +139,7 @@ export class HomeScene implements Scene {
     this.drawWarehouseButton();
 
     if (this.selectedLandId !== null) {
-      drawPlantMenu(ctx, this.width, this.height, getAllPlants(), this.state.gold);
+      drawPlantMenu(ctx, this.width, this.height, getAllPlants(), this.state.gold, this.state.getLevel());
     }
 
     if (this.showCheckIn) {
@@ -227,7 +227,7 @@ export class HomeScene implements Scene {
 
     if (this.selectedLandId !== null) {
       const plants = getAllPlants();
-      const action = hitTestPlantMenu(x, y, this.width, this.height, plants, this.state.gold);
+      const action = hitTestPlantMenu(x, y, this.width, this.height, plants, this.state.gold, this.state.getLevel());
       if (action !== null && action.type === "plant") {
         this.state.plantOn(this.selectedLandId, action.plantId);
       }

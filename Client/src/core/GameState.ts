@@ -6,6 +6,7 @@ import { getPlant } from "./PlantConfig";
 import { getCheckInRewardGold } from "./CheckInConfig";
 import { getFlatGoldPerHarvest } from "./HarvestConfig";
 import { getOrderForDate, OrderTemplate } from "./OrderConfig";
+import { getLevelForExp } from "./LevelConfig";
 import {
   getStartingWarehouseLevel,
   getWarehouseCapacity as calcWarehouseCapacity,
@@ -81,8 +82,12 @@ export class GameState {
     writeSave(data);
   }
 
+  getLevel(): number {
+    return getLevelForExp(this.exp);
+  }
+
   getWarehouseCapacity(): number {
-    return calcWarehouseCapacity(this.warehouseLevel);
+    return calcWarehouseCapacity(this.warehouseLevel, this.getLevel());
   }
 
   getWarehouseUsed(): number {
@@ -162,11 +167,11 @@ export class GameState {
     return reward;
   }
 
-  /** 在指定土地上种植，金币不足时返回 false，不做任何改动。 */
+  /** 在指定土地上种植，金币不足或等级不够时返回 false，不做任何改动。 */
   plantOn(landId: number, plantId: string): boolean {
     const land = this.lands[landId];
     const plant = getPlant(plantId);
-    if (!land || land.data.status !== "empty" || this.gold < plant.buyPrice) {
+    if (!land || land.data.status !== "empty" || this.gold < plant.buyPrice || this.getLevel() < plant.requiredLevel) {
       return false;
     }
     this.gold -= plant.buyPrice;

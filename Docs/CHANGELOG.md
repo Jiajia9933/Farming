@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2026-08-04 — Version 0.8.1
+
+新增：
+
+- 等级给了实际作用：作物按等级解锁（胡萝卜/玉米 Lv.1、番茄 Lv.3、土豆 Lv.5、西瓜 Lv.10，`config/plants.json` 的 `requiredLevel`），种植菜单里等级不够的作物显示 🔒 和"Lv.X解锁"，点不了
+- 玩家等级达到 Lv.15 时仓库容量额外 +50（跟仓库自己升级是两回事，两者叠加），`config/warehouse.json` 的 `capacityBonusPlayerLevel`/`capacityBonus`
+
 ## 2026-08-04 — Version 0.8.0
 
 新增：
