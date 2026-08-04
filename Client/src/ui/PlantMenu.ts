@@ -82,20 +82,20 @@ export function drawPlantMenu(
     ctx.fillText(plant.icon, row.x + 12, row.y + row.h / 2);
 
     ctx.font = "12px sans-serif";
-    ctx.fillText(`⏱${formatMatureTime(plant.matureSeconds)}`, row.x + 48, row.y + row.h / 2);
+    ctx.fillText(`成熟：${formatMatureTime(plant.matureSeconds)}`, row.x + 48, row.y + row.h / 2);
 
     ctx.font = "16px sans-serif";
     ctx.textAlign = "right";
-    ctx.fillText(`💰${plant.buyPrice}`, row.x + row.w - 12, row.y + row.h / 2);
+    ctx.fillText(`${plant.buyPrice}金币`, row.x + row.w - 12, row.y + row.h / 2);
   });
 
   const cancel = layout.cancelBtn;
   ctx.fillStyle = "#aaaaaa";
   ctx.fillRect(cancel.x, cancel.y, cancel.w, cancel.h);
   ctx.fillStyle = "#ffffff";
-  ctx.font = "18px sans-serif";
+  ctx.font = "16px sans-serif";
   ctx.textAlign = "center";
-  ctx.fillText("✖️", cancel.x + cancel.w / 2, cancel.y + cancel.h / 2);
+  ctx.fillText("取消", cancel.x + cancel.w / 2, cancel.y + cancel.h / 2);
 }
 
 function formatMatureTime(seconds: number): string {

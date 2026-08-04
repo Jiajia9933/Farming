@@ -66,10 +66,10 @@ export class WarehouseScene implements Scene {
     ctx.fillStyle = "#333333";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.font = "22px sans-serif";
-    ctx.fillText(`📦 Lv.${this.state.warehouseLevel}`, this.width / 2, this.safeTop + 26);
+    ctx.font = "18px sans-serif";
+    ctx.fillText(`仓库 Lv.${this.state.warehouseLevel}`, this.width / 2, this.safeTop + 26);
     ctx.font = "14px sans-serif";
-    ctx.fillText(`${used} / ${capacity}`, this.width / 2, this.safeTop + 52);
+    ctx.fillText(`容量 ${used} / ${capacity}`, this.width / 2, this.safeTop + 50);
 
     this.drawInventoryList();
     this.drawTodayOrder();
@@ -110,12 +110,12 @@ export class WarehouseScene implements Scene {
     ctx.textAlign = "left";
     ctx.textBaseline = "middle";
     ctx.fillStyle = "#333333";
+    ctx.font = "16px sans-serif";
+    ctx.fillText("今日订单", GRID_MARGIN, top);
     ctx.font = "18px sans-serif";
-    ctx.fillText("📋", GRID_MARGIN, top);
-    ctx.font = "18px sans-serif";
-    ctx.fillText(requirementText, GRID_MARGIN + 30, top);
+    ctx.fillText(requirementText, GRID_MARGIN + 68, top);
     ctx.font = "14px sans-serif";
-    ctx.fillText(`💰${order.rewardGold}  ⭐${order.rewardExp}`, GRID_MARGIN, top + 26);
+    ctx.fillText(`奖励：${order.rewardGold}金币 / ${order.rewardExp}经验`, GRID_MARGIN, top + 26);
 
     const btn = this.submitOrderButton;
     const completedToday = !this.state.canCompleteOrderToday();
@@ -124,10 +124,10 @@ export class WarehouseScene implements Scene {
     ctx.fillStyle = completedToday ? "#cccccc" : enoughStock ? "#4caf50" : "#cccccc";
     ctx.fillRect(btn.x, btn.y, btn.w, btn.h);
     ctx.fillStyle = "#ffffff";
-    ctx.font = "18px sans-serif";
+    ctx.font = "16px sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    const label = completedToday ? "✅" : enoughStock ? "📮" : "❌";
+    const label = completedToday ? "今日已完成" : enoughStock ? "交订单" : "库存不足";
     ctx.fillText(label, btn.x + btn.w / 2, btn.y + btn.h / 2);
   }
 
@@ -143,7 +143,7 @@ export class WarehouseScene implements Scene {
     ctx.font = "16px sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    const label = cost === null ? "🔒" : `⬆️💰${cost}`;
+    const label = cost === null ? "仓库已满级" : `升级仓库（${cost}金币）`;
     ctx.fillText(label, btn.x + btn.w / 2, btn.y + btn.h / 2);
   }
 
@@ -155,10 +155,10 @@ export class WarehouseScene implements Scene {
     ctx.fillStyle = hasStock ? "#e07b39" : "#cccccc";
     ctx.fillRect(btn.x, btn.y, btn.w, btn.h);
     ctx.fillStyle = "#ffffff";
-    ctx.font = "18px sans-serif";
+    ctx.font = "16px sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText("💵", btn.x + btn.w / 2, btn.y + btn.h / 2);
+    ctx.fillText("全部卖出", btn.x + btn.w / 2, btn.y + btn.h / 2);
   }
 
   private drawBackButton(): void {
@@ -167,10 +167,10 @@ export class WarehouseScene implements Scene {
     ctx.fillStyle = "#5b8def";
     ctx.fillRect(btn.x, btn.y, btn.w, btn.h);
     ctx.fillStyle = "#ffffff";
-    ctx.font = "20px sans-serif";
+    ctx.font = "16px sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText("🔙", btn.x + btn.w / 2, btn.y + btn.h / 2);
+    ctx.fillText("返回", btn.x + btn.w / 2, btn.y + btn.h / 2);
   }
 
   private isInside(x: number, y: number, rect: Rect): boolean {

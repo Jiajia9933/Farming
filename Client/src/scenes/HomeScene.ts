@@ -130,10 +130,10 @@ export class HomeScene implements Scene {
     ctx.fillStyle = "#5b8def";
     ctx.fillRect(btn.x, btn.y, btn.w, btn.h);
     ctx.fillStyle = "#ffffff";
-    ctx.font = "22px sans-serif";
+    ctx.font = "16px sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText("👥", btn.x + btn.w / 2, btn.y + btn.h / 2);
+    ctx.fillText("拜访好友", btn.x + btn.w / 2, btn.y + btn.h / 2);
   }
 
   private drawWarehouseButton(): void {
@@ -142,39 +142,35 @@ export class HomeScene implements Scene {
     ctx.fillStyle = "#e0a13a";
     ctx.fillRect(btn.x, btn.y, btn.w, btn.h);
     ctx.fillStyle = "#ffffff";
-    ctx.font = "22px sans-serif";
+    ctx.font = "16px sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText("📦", btn.x + btn.w / 2, btn.y + btn.h / 2);
+    ctx.fillText("仓库", btn.x + btn.w / 2, btn.y + btn.h / 2);
   }
 
   private drawLand(rect: LandRect, now: number): void {
     const ctx = this.ctx;
     const land = this.state.lands[rect.id];
+    const mature = land.data.status === "growing" && land.isMature(now);
 
-    if (land.data.status === "empty") {
-      ctx.fillStyle = "#8b5a2b";
-    } else if (land.isMature(now)) {
-      ctx.fillStyle = "#e07b39";
-    } else {
-      ctx.fillStyle = "#5fa85f";
-    }
+    // 不管种的什么、成不成熟，土地背景都用统一的土色，
+    // 避免作物图标的颜色（比如橙色的胡萝卜）跟背景色撞在一起看不清。
+    ctx.fillStyle = land.data.status === "empty" ? "#8b5a2b" : "#6b4a2f";
     ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
 
-    ctx.strokeStyle = "#3c3c3c";
-    ctx.lineWidth = 2;
+    ctx.strokeStyle = mature ? "#ffd54f" : "#3c3c3c";
+    ctx.lineWidth = mature ? 4 : 2;
     ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
 
     if (land.data.status === "growing" && land.data.plantId !== null) {
       const plant = getPlant(land.data.plantId);
-      const mature = land.isMature(now);
       ctx.fillStyle = "#ffffff";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.font = "22px sans-serif";
+      ctx.font = "26px sans-serif";
       ctx.fillText(plant.icon, rect.x + rect.w / 2, rect.y + rect.h / 2 - 10);
       ctx.font = "14px sans-serif";
-      ctx.fillText(mature ? "✅" : `${land.remainingSeconds(now)}s`, rect.x + rect.w / 2, rect.y + rect.h / 2 + 14);
+      ctx.fillText(mature ? "可收获" : `${land.remainingSeconds(now)}s`, rect.x + rect.w / 2, rect.y + rect.h / 2 + 16);
     }
   }
 
