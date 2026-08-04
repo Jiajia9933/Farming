@@ -3,6 +3,7 @@
 
 import { GameState } from "../core/GameState";
 import { getPlant, getAllPlants } from "../core/PlantConfig";
+import { drawResultDialog, hitTestResultDialog } from "../ui/ResultDialog";
 import { Scene } from "./Scene";
 
 const GRID_MARGIN = 16;
@@ -30,6 +31,7 @@ export class WarehouseScene implements Scene {
   private sellAllButton: Rect;
   private backButton: Rect;
   private submitOrderButton: Rect;
+  private sellResultGold: number | null = null;
 
   constructor(ctx: WxCanvasContext2D, width: number, height: number, safeTop: number, state: GameState, onBack: () => void) {
     this.ctx = ctx;
@@ -76,6 +78,10 @@ export class WarehouseScene implements Scene {
     this.drawUpgradeButton();
     this.drawSellAllButton();
     this.drawBackButton();
+
+    if (this.sellResultGold !== null) {
+      drawResultDialog(ctx, this.width, this.height, `卖出成功 +${this.sellResultGold}金币`);
+    }
   }
 
   private drawInventoryList(): void {
@@ -178,6 +184,13 @@ export class WarehouseScene implements Scene {
   }
 
   handleTouch(x: number, y: number): void {
+    if (this.sellResultGold !== null) {
+      if (hitTestResultDialog(x, y, this.width, this.height)) {
+        this.sellResultGold = null;
+      }
+      return;
+    }
+
     if (this.isInside(x, y, this.submitOrderButton)) {
       this.state.completeOrder();
       return;
@@ -186,8 +199,8 @@ export class WarehouseScene implements Scene {
       this.state.upgradeWarehouse();
       return;
     }
-    if (this.isInside(x, y, this.sellAllButton)) {
-      this.state.sellAllInventory();
+    if (this.isInside(x, y, this.sellAllButton) && this.state.getWarehouseUsed() > 0) {
+      this.sellResultGold = this.state.sellAllInventory();
       return;
     }
     if (this.isInside(x, y, this.backButton)) {
