@@ -4,7 +4,7 @@
     "name": "胡萝卜",
     "buyPrice": 20,
     "sellPrice": 30,
-    "matureSeconds": 300,
+    "matureSeconds": 60,
     "exp": 5
   },
   "corn": {
@@ -12,7 +12,7 @@
     "name": "玉米",
     "buyPrice": 50,
     "sellPrice": 70,
-    "matureSeconds": 900,
+    "matureSeconds": 120,
     "exp": 15
   },
   "tomato": {
@@ -20,7 +20,7 @@
     "name": "番茄",
     "buyPrice": 100,
     "sellPrice": 150,
-    "matureSeconds": 1800,
+    "matureSeconds": 300,
     "exp": 30
   }
 }
