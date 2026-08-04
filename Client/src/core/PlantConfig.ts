@@ -7,6 +7,10 @@ export interface PlantDef {
   id: string;
   name: string;
   icon: string;
+  /** 发芽阶段的图标，每种作物不一样，让还没成熟的地块也能一眼分辨种的是什么。 */
+  sproutIcon: string;
+  /** 半成熟阶段的图标，同样每种作物不一样。 */
+  growingIcon: string;
   buyPrice: number;
   sellPrice: number;
   matureSeconds: number;

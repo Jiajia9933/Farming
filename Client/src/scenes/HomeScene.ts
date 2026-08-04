@@ -50,6 +50,8 @@ export class HomeScene implements Scene {
   private visitButton: Rect;
   private warehouseButton: Rect;
   private selectedLandId: number | null = null;
+  /** 点了哪块生长中（未成熟）的地，要在上面显示作物名字；再点一下换回倒计时。 */
+  private infoLandId: number | null = null;
   private showCheckIn: boolean;
 
   constructor(
@@ -188,10 +190,10 @@ export class HomeScene implements Scene {
       let icon: string;
       let iconSize: number;
       if (stage === "sprout") {
-        icon = "🌱";
+        icon = plant.sproutIcon;
         iconSize = 16;
       } else if (stage === "growing") {
-        icon = "🌿";
+        icon = plant.growingIcon;
         iconSize = 22;
       } else {
         icon = plant.icon;
@@ -203,9 +205,11 @@ export class HomeScene implements Scene {
       ctx.textBaseline = "middle";
       ctx.font = `${iconSize}px sans-serif`;
       ctx.fillText(icon, rect.x + rect.w / 2, rect.y + rect.h / 2 - 10);
+
+      const showName = this.infoLandId === rect.id;
       ctx.font = "14px sans-serif";
       ctx.fillText(
-        stage === "mature" ? "可收获" : `${land.remainingSeconds(now)}s`,
+        stage === "mature" ? "可收获" : showName ? plant.name : `${land.remainingSeconds(now)}s`,
         rect.x + rect.w / 2,
         rect.y + rect.h / 2 + 16
       );
@@ -262,7 +266,11 @@ export class HomeScene implements Scene {
     if (land.data.status === "empty") {
       this.selectedLandId = rect.id;
     } else if (land.isMature(now)) {
+      this.infoLandId = null;
       this.state.harvest(rect.id);
+    } else {
+      // 生长中但还没成熟：点一下看名字，再点一下换回倒计时。
+      this.infoLandId = this.infoLandId === rect.id ? null : rect.id;
     }
   }
 }
