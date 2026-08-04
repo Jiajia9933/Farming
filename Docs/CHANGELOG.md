@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2026-08-04 — Version 0.8.0
+
+新增：
+
+- 等级系统：经验按曲线换算成等级（`Client/config/levels.json`，baseExp 50 / growthRate 1.3），HUD 显示"Lv.X（经验: Y）"
+- 等级目前只是经验的展示换算，没有升级奖励/解锁内容（记在 [04_经济系统.md](04_经济系统.md) 待补充里）
+
 ## 2026-08-04 — Version 0.7.2
 
 新增：

@@ -1,5 +1,7 @@
-// 顶部资源栏：金币、经验。
-// safeTop 是胶囊按钮顶部的 y 坐标（wx.getMenuButtonBoundingClientRect().top），保证文字画在刘海/状态栏下面。
+// 顶部资源栏：金币、等级/经验。
+// safeTop 是状态栏高度（wx.getSystemInfoSync().statusBarHeight），保证文字画在刘海/状态栏下面。
+
+import { getLevelForExp } from "../core/LevelConfig";
 
 const CONTENT_HEIGHT = 44;
 
@@ -18,5 +20,5 @@ export function drawHUD(ctx: WxCanvasContext2D, width: number, safeTop: number, 
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
   ctx.fillText(`金币: ${gold}`, 16, textY);
-  ctx.fillText(`经验: ${exp}`, width / 2, textY);
+  ctx.fillText(`Lv.${getLevelForExp(exp)}（经验: ${exp}）`, width / 2, textY);
 }
