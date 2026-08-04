@@ -5,6 +5,7 @@ import { Scene } from "./scenes/Scene";
 import { HomeScene } from "./scenes/HomeScene";
 import { MapScene } from "./scenes/MapScene";
 import { FriendFarmScene } from "./scenes/FriendFarmScene";
+import { WarehouseScene } from "./scenes/WarehouseScene";
 
 const systemInfo = wx.getSystemInfoSync();
 const canvas = wx.createCanvas();
@@ -21,7 +22,11 @@ const state = new GameState();
 let currentScene!: Scene;
 
 function showHome(): void {
-  currentScene = new HomeScene(ctx, canvas.width, canvas.height, safeTop, state, showMap);
+  currentScene = new HomeScene(ctx, canvas.width, canvas.height, safeTop, state, showMap, showWarehouse);
+}
+
+function showWarehouse(): void {
+  currentScene = new WarehouseScene(ctx, canvas.width, canvas.height, safeTop, state, showHome);
 }
 
 function showMap(): void {

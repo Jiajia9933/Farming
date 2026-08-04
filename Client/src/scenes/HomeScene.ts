@@ -13,7 +13,8 @@ const GRID_COLS = 5;
 const GRID_ROWS = 2;
 const GRID_MARGIN = 16;
 const CELL_GAP = 12;
-const VISIT_BUTTON_HEIGHT = 48;
+const BOTTOM_BUTTON_HEIGHT = 48;
+const BOTTOM_BUTTON_GAP = 12;
 
 interface LandRect {
   id: number;
@@ -37,8 +38,10 @@ export class HomeScene implements Scene {
   private state: GameState;
   private safeTop: number;
   private onVisitFriends: () => void;
+  private onOpenWarehouse: () => void;
   private landRects: LandRect[];
   private visitButton: Rect;
+  private warehouseButton: Rect;
   private selectedLandId: number | null = null;
   private showCheckIn: boolean;
 
@@ -48,7 +51,8 @@ export class HomeScene implements Scene {
     height: number,
     safeTop: number,
     state: GameState,
-    onVisitFriends: () => void
+    onVisitFriends: () => void,
+    onOpenWarehouse: () => void
   ) {
     this.ctx = ctx;
     this.width = width;
@@ -56,8 +60,11 @@ export class HomeScene implements Scene {
     this.safeTop = safeTop;
     this.state = state;
     this.onVisitFriends = onVisitFriends;
+    this.onOpenWarehouse = onOpenWarehouse;
     this.landRects = this.computeLandRects();
-    this.visitButton = this.computeVisitButton();
+    const bottomButtons = this.computeBottomButtons();
+    this.visitButton = bottomButtons.visitButton;
+    this.warehouseButton = bottomButtons.warehouseButton;
     this.showCheckIn = state.canCheckInToday();
   }
 
@@ -82,13 +89,14 @@ export class HomeScene implements Scene {
     return rects;
   }
 
-  private computeVisitButton(): Rect {
+  private computeBottomButtons(): { visitButton: Rect; warehouseButton: Rect } {
     const lastRow = this.landRects[this.landRects.length - 1];
+    const y = lastRow.y + lastRow.h + GRID_MARGIN;
+    const totalWidth = this.width - GRID_MARGIN * 2;
+    const buttonWidth = (totalWidth - BOTTOM_BUTTON_GAP) / 2;
     return {
-      x: GRID_MARGIN,
-      y: lastRow.y + lastRow.h + GRID_MARGIN,
-      w: this.width - GRID_MARGIN * 2,
-      h: VISIT_BUTTON_HEIGHT,
+      visitButton: { x: GRID_MARGIN, y, w: buttonWidth, h: BOTTOM_BUTTON_HEIGHT },
+      warehouseButton: { x: GRID_MARGIN + buttonWidth + BOTTOM_BUTTON_GAP, y, w: buttonWidth, h: BOTTOM_BUTTON_HEIGHT },
     };
   }
 
@@ -105,6 +113,7 @@ export class HomeScene implements Scene {
 
     drawHUD(ctx, this.width, this.safeTop, this.state.gold, this.state.exp);
     this.drawVisitButton();
+    this.drawWarehouseButton();
 
     if (this.selectedLandId !== null) {
       drawPlantMenu(ctx, this.width, this.height, getAllPlants(), this.state.gold);
@@ -125,6 +134,18 @@ export class HomeScene implements Scene {
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText("拜访好友", btn.x + btn.w / 2, btn.y + btn.h / 2);
+  }
+
+  private drawWarehouseButton(): void {
+    const ctx = this.ctx;
+    const btn = this.warehouseButton;
+    ctx.fillStyle = "#e0a13a";
+    ctx.fillRect(btn.x, btn.y, btn.w, btn.h);
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "16px sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("仓库", btn.x + btn.w / 2, btn.y + btn.h / 2);
   }
 
   private drawLand(rect: LandRect, now: number): void {
@@ -177,9 +198,20 @@ export class HomeScene implements Scene {
       return;
     }
 
-    const btn = this.visitButton;
-    if (x >= btn.x && x <= btn.x + btn.w && y >= btn.y && y <= btn.y + btn.h) {
+    const visitBtn = this.visitButton;
+    if (x >= visitBtn.x && x <= visitBtn.x + visitBtn.w && y >= visitBtn.y && y <= visitBtn.y + visitBtn.h) {
       this.onVisitFriends();
+      return;
+    }
+
+    const warehouseBtn = this.warehouseButton;
+    if (
+      x >= warehouseBtn.x &&
+      x <= warehouseBtn.x + warehouseBtn.w &&
+      y >= warehouseBtn.y &&
+      y <= warehouseBtn.y + warehouseBtn.h
+    ) {
+      this.onOpenWarehouse();
       return;
     }
 

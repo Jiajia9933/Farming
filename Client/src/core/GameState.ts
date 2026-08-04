@@ -4,6 +4,11 @@
 import { loadSave, writeSave } from "./SaveManager";
 import { getPlant } from "./PlantConfig";
 import { getCheckInRewardGold } from "./CheckInConfig";
+import {
+  getStartingWarehouseLevel,
+  getWarehouseCapacity as calcWarehouseCapacity,
+  getUpgradeCost as calcUpgradeCost,
+} from "./WarehouseConfig";
 import { Land, LandData } from "../entities/Land";
 
 const LAND_COUNT = 10;
@@ -14,6 +19,8 @@ interface SaveData {
   exp: number;
   lands: LandData[];
   lastCheckInDate: string | null;
+  inventory: Record<string, number>;
+  warehouseLevel: number;
 }
 
 function createDefaultSave(): SaveData {
@@ -21,7 +28,14 @@ function createDefaultSave(): SaveData {
   for (let i = 0; i < LAND_COUNT; i++) {
     lands.push({ id: i, status: "empty", plantId: null, plantedAt: null });
   }
-  return { gold: STARTING_GOLD, exp: 0, lands, lastCheckInDate: null };
+  return {
+    gold: STARTING_GOLD,
+    exp: 0,
+    lands,
+    lastCheckInDate: null,
+    inventory: {},
+    warehouseLevel: getStartingWarehouseLevel(),
+  };
 }
 
 /** 本地设备日期的 yyyy-M-d 字符串。还没有服务器（见 Docs/11_技术架构.md），暂时用设备时间判断"今天"。 */
@@ -34,6 +48,8 @@ export class GameState {
   gold: number;
   exp: number;
   lands: Land[];
+  inventory: Record<string, number>;
+  warehouseLevel: number;
   private lastCheckInDate: string | null;
 
   constructor() {
@@ -42,6 +58,8 @@ export class GameState {
     this.exp = save.exp;
     this.lands = save.lands.map((data) => new Land(data));
     this.lastCheckInDate = save.lastCheckInDate;
+    this.inventory = save.inventory;
+    this.warehouseLevel = save.warehouseLevel;
   }
 
   private save(): void {
@@ -50,8 +68,46 @@ export class GameState {
       exp: this.exp,
       lands: this.lands.map((land) => land.data),
       lastCheckInDate: this.lastCheckInDate,
+      inventory: this.inventory,
+      warehouseLevel: this.warehouseLevel,
     };
     writeSave(data);
+  }
+
+  getWarehouseCapacity(): number {
+    return calcWarehouseCapacity(this.warehouseLevel);
+  }
+
+  getWarehouseUsed(): number {
+    return Object.values(this.inventory).reduce((sum, count) => sum + count, 0);
+  }
+
+  /** 升到下一级需要的金币；已经满级时返回 null。 */
+  getUpgradeCost(): number | null {
+    return calcUpgradeCost(this.warehouseLevel);
+  }
+
+  upgradeWarehouse(): boolean {
+    const cost = this.getUpgradeCost();
+    if (cost === null || this.gold < cost) {
+      return false;
+    }
+    this.gold -= cost;
+    this.warehouseLevel += 1;
+    this.save();
+    return true;
+  }
+
+  /** 仓库里的作物一次性全部卖出换金币，返回卖出所得。第一版没有单独商店，先用这个占位。 */
+  sellAllInventory(): number {
+    let totalGold = 0;
+    for (const [plantId, count] of Object.entries(this.inventory)) {
+      totalGold += getPlant(plantId).sellPrice * count;
+    }
+    this.inventory = {};
+    this.gold += totalGold;
+    this.save();
+    return totalGold;
   }
 
   canCheckInToday(): boolean {
@@ -83,16 +139,23 @@ export class GameState {
     return true;
   }
 
-  /** 收获成熟作物，返回是否成功收获。 */
+  /**
+   * 收获成熟作物存进仓库（经验立刻到手，金币要等仓库里卖出才有）。
+   * 仓库满了会收获失败，地里的作物保留，等腾出空间再收。
+   */
   harvest(landId: number): boolean {
     const land = this.lands[landId];
     const now = Date.now();
     if (!land || !land.isMature(now)) {
       return false;
     }
-    const plant = getPlant(land.data.plantId as string);
-    this.gold += plant.sellPrice;
+    if (this.getWarehouseUsed() >= this.getWarehouseCapacity()) {
+      return false;
+    }
+    const plantId = land.data.plantId as string;
+    const plant = getPlant(plantId);
     this.exp += plant.exp;
+    this.inventory[plantId] = (this.inventory[plantId] || 0) + 1;
     land.harvest();
     this.save();
     return true;

@@ -1,0 +1,6 @@
+{
+  "startingLevel": 1,
+  "maxLevel": 20,
+  "capacityPerLevel": 10,
+  "upgradeGoldPerLevel": 100
+}
