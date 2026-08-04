@@ -9,8 +9,8 @@ canvas.width = systemInfo.windowWidth;
 canvas.height = systemInfo.windowHeight;
 const ctx = canvas.getContext("2d");
 
-// 用胶囊按钮的位置确定顶部安全区域，避开刘海屏/状态栏。
-const safeTop = wx.getMenuButtonBoundingClientRect().top;
+// 用状态栏高度确定顶部安全区域，避开刘海屏/状态栏。
+const safeTop = systemInfo.statusBarHeight || 20;
 
 const state = new GameState();
 const scene = new HomeScene(ctx, canvas.width, canvas.height, safeTop, state);
