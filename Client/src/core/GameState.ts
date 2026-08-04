@@ -4,6 +4,7 @@
 import { loadSave, writeSave } from "./SaveManager";
 import { getPlant } from "./PlantConfig";
 import { getCheckInRewardGold } from "./CheckInConfig";
+import { getFlatGoldPerHarvest } from "./HarvestConfig";
 import {
   getStartingWarehouseLevel,
   getWarehouseCapacity as calcWarehouseCapacity,
@@ -140,7 +141,7 @@ export class GameState {
   }
 
   /**
-   * 收获成熟作物存进仓库（经验立刻到手，金币要等仓库里卖出才有）。
+   * 收获成熟作物存进仓库（经验立刻到手，每块地额外给固定金币，作物本身的钱要等仓库卖出才有）。
    * 仓库满了会收获失败，地里的作物保留，等腾出空间再收。
    */
   harvest(landId: number): boolean {
@@ -155,6 +156,7 @@ export class GameState {
     const plantId = land.data.plantId as string;
     const plant = getPlant(plantId);
     this.exp += plant.exp;
+    this.gold += getFlatGoldPerHarvest();
     this.inventory[plantId] = (this.inventory[plantId] || 0) + 1;
     land.harvest();
     this.save();
