@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-08-04 — Version 0.5.2
+
+修复：
+
+- 存档读取改成跟默认值浅合并，不再假设旧存档已经有全部字段。旧存档缺 `inventory`/`warehouseLevel` 导致 `this.inventory` 是 `undefined`，一进仓库场景或点收获就在 `Object.values(undefined)` 上崩溃（仓库白屏、收获没反应）
+
 ## 2026-08-04 — Version 0.5.1
 
 新增：

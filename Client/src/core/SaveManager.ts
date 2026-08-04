@@ -3,12 +3,16 @@
 
 const SAVE_KEY = "greenfarm_save";
 
-export function loadSave<T>(defaultValue: T): T {
-  const data = wx.getStorageSync<T>(SAVE_KEY);
+/**
+ * 跟默认值做浅合并，而不是假设旧存档已经有全部字段——
+ * 每次给存档加新字段（比如仓库、签到）都会有玩家的存档是旧版本存的，缺新字段。
+ */
+export function loadSave<T extends object>(defaultValue: T): T {
+  const data = wx.getStorageSync<Partial<T>>(SAVE_KEY);
   if (!data) {
     return defaultValue;
   }
-  return data;
+  return { ...defaultValue, ...data };
 }
 
 export function writeSave<T>(data: T): void {
