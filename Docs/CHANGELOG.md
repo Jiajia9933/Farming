@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2026-08-04 — Version 0.4.0
+
+新增：
+
+- 每日签到：每天首次进入首页弹窗领取金币（默认10金币，见 `Client/config/checkin.json`），未签到状态和日期存进本地存档
+- 抽出通用配置读取工具 `ConfigLoader.ts`，`PlantConfig.ts` 和新的 `CheckInConfig.ts` 共用
+
 ## 2026-08-04 — Version 0.3.0
 
 新增：

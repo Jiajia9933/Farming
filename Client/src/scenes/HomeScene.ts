@@ -3,8 +3,10 @@
 
 import { GameState } from "../core/GameState";
 import { getPlant, getAllPlants } from "../core/PlantConfig";
+import { getCheckInRewardGold } from "../core/CheckInConfig";
 import { drawHUD, getHudHeight } from "../ui/HUD";
 import { drawPlantMenu, hitTestPlantMenu } from "../ui/PlantMenu";
+import { drawCheckInDialog, hitTestCheckInDialog } from "../ui/CheckInDialog";
 import { Scene } from "./Scene";
 
 const GRID_COLS = 5;
@@ -38,6 +40,7 @@ export class HomeScene implements Scene {
   private landRects: LandRect[];
   private visitButton: Rect;
   private selectedLandId: number | null = null;
+  private showCheckIn: boolean;
 
   constructor(
     ctx: WxCanvasContext2D,
@@ -55,6 +58,7 @@ export class HomeScene implements Scene {
     this.onVisitFriends = onVisitFriends;
     this.landRects = this.computeLandRects();
     this.visitButton = this.computeVisitButton();
+    this.showCheckIn = state.canCheckInToday();
   }
 
   private computeLandRects(): LandRect[] {
@@ -105,6 +109,10 @@ export class HomeScene implements Scene {
     if (this.selectedLandId !== null) {
       drawPlantMenu(ctx, this.width, this.height, getAllPlants(), this.state.gold);
     }
+
+    if (this.showCheckIn) {
+      drawCheckInDialog(ctx, this.width, this.height, getCheckInRewardGold());
+    }
   }
 
   private drawVisitButton(): void {
@@ -149,6 +157,14 @@ export class HomeScene implements Scene {
   }
 
   handleTouch(x: number, y: number): void {
+    if (this.showCheckIn) {
+      if (hitTestCheckInDialog(x, y, this.width, this.height)) {
+        this.state.claimDailyCheckIn();
+        this.showCheckIn = false;
+      }
+      return;
+    }
+
     if (this.selectedLandId !== null) {
       const plants = getAllPlants();
       const action = hitTestPlantMenu(x, y, this.width, this.height, plants, this.state.gold);
