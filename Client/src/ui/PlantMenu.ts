@@ -4,7 +4,7 @@ import { PlantDef } from "../core/PlantConfig";
 
 export type PlantMenuAction = { type: "plant"; plantId: string } | { type: "cancel" };
 
-const ROW_HEIGHT = 52;
+const ROW_HEIGHT = 56;
 const ROW_GAP = 8;
 const PANEL_PADDING = 16;
 const PANEL_WIDTH = 260;
@@ -75,11 +75,16 @@ export function drawPlantMenu(
     ctx.fillRect(row.x, row.y, row.w, row.h);
 
     ctx.fillStyle = "#ffffff";
+    ctx.textBaseline = "middle";
+
     ctx.font = "16px sans-serif";
     ctx.textAlign = "left";
-    ctx.textBaseline = "middle";
-    ctx.fillText(plant.name, row.x + 12, row.y + row.h / 2);
+    ctx.fillText(plant.name, row.x + 12, row.y + 18);
 
+    ctx.font = "12px sans-serif";
+    ctx.fillText(`成熟：${formatMatureTime(plant.matureSeconds)}`, row.x + 12, row.y + row.h - 16);
+
+    ctx.font = "16px sans-serif";
     ctx.textAlign = "right";
     ctx.fillText(`${plant.buyPrice}金币`, row.x + row.w - 12, row.y + row.h / 2);
   });
@@ -91,6 +96,16 @@ export function drawPlantMenu(
   ctx.font = "16px sans-serif";
   ctx.textAlign = "center";
   ctx.fillText("取消", cancel.x + cancel.w / 2, cancel.y + cancel.h / 2);
+}
+
+function formatMatureTime(seconds: number): string {
+  if (seconds < 60) {
+    return `${seconds}秒`;
+  }
+  if (seconds % 60 === 0) {
+    return `${seconds / 60}分钟`;
+  }
+  return `${Math.floor(seconds / 60)}分${seconds % 60}秒`;
 }
 
 function isInside(x: number, y: number, rect: RowRect): boolean {
