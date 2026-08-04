@@ -53,16 +53,16 @@ export class MapScene implements Scene {
     ctx.fillRect(0, 0, this.width, this.height);
 
     ctx.fillStyle = "#333333";
-    ctx.font = "20px sans-serif";
+    ctx.font = "22px sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText("地图", this.width / 2, this.safeTop + 30);
+    ctx.fillText("🗺️", this.width / 2, this.safeTop + 30);
 
-    this.drawCard(this.homeCard, "我的农场");
-    this.drawCard(this.friendCard, "好友农场（示例）");
+    this.drawCard(this.homeCard, "🏡");
+    this.drawCard(this.friendCard, "🧑‍🌾");
   }
 
-  private drawCard(card: CardRect, label: string): void {
+  private drawCard(card: CardRect, icon: string): void {
     const ctx = this.ctx;
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(card.x, card.y, card.w, card.h);
@@ -71,10 +71,10 @@ export class MapScene implements Scene {
     ctx.strokeRect(card.x, card.y, card.w, card.h);
 
     ctx.fillStyle = "#333333";
-    ctx.font = "18px sans-serif";
+    ctx.font = "36px sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(label, card.x + card.w / 2, card.y + card.h / 2);
+    ctx.fillText(icon, card.x + card.w / 2, card.y + card.h / 2);
   }
 
   handleTouch(x: number, y: number): void {

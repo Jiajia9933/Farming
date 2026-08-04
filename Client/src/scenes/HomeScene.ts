@@ -130,10 +130,10 @@ export class HomeScene implements Scene {
     ctx.fillStyle = "#5b8def";
     ctx.fillRect(btn.x, btn.y, btn.w, btn.h);
     ctx.fillStyle = "#ffffff";
-    ctx.font = "16px sans-serif";
+    ctx.font = "22px sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText("拜访好友", btn.x + btn.w / 2, btn.y + btn.h / 2);
+    ctx.fillText("👥", btn.x + btn.w / 2, btn.y + btn.h / 2);
   }
 
   private drawWarehouseButton(): void {
@@ -142,10 +142,10 @@ export class HomeScene implements Scene {
     ctx.fillStyle = "#e0a13a";
     ctx.fillRect(btn.x, btn.y, btn.w, btn.h);
     ctx.fillStyle = "#ffffff";
-    ctx.font = "16px sans-serif";
+    ctx.font = "22px sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText("仓库", btn.x + btn.w / 2, btn.y + btn.h / 2);
+    ctx.fillText("📦", btn.x + btn.w / 2, btn.y + btn.h / 2);
   }
 
   private drawLand(rect: LandRect, now: number): void {
@@ -167,13 +167,14 @@ export class HomeScene implements Scene {
 
     if (land.data.status === "growing" && land.data.plantId !== null) {
       const plant = getPlant(land.data.plantId);
-      const statusLine = land.isMature(now) ? "可收获" : `${land.remainingSeconds(now)}s`;
+      const mature = land.isMature(now);
       ctx.fillStyle = "#ffffff";
-      ctx.font = "14px sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText(plant.name, rect.x + rect.w / 2, rect.y + rect.h / 2 - 10);
-      ctx.fillText(statusLine, rect.x + rect.w / 2, rect.y + rect.h / 2 + 10);
+      ctx.font = "22px sans-serif";
+      ctx.fillText(plant.icon, rect.x + rect.w / 2, rect.y + rect.h / 2 - 10);
+      ctx.font = "14px sans-serif";
+      ctx.fillText(mature ? "✅" : `${land.remainingSeconds(now)}s`, rect.x + rect.w / 2, rect.y + rect.h / 2 + 14);
     }
   }
 

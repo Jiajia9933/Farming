@@ -17,6 +17,6 @@ export function drawHUD(ctx: WxCanvasContext2D, width: number, safeTop: number, 
   ctx.font = "20px sans-serif";
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
-  ctx.fillText(`金币: ${gold}`, 16, textY);
-  ctx.fillText(`经验: ${exp}`, width / 2, textY);
+  ctx.fillText(`💰${gold}`, 16, textY);
+  ctx.fillText(`⭐${exp}`, width / 2, textY);
 }

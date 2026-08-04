@@ -37,16 +37,17 @@ export function drawCheckInDialog(ctx: WxCanvasContext2D, width: number, height:
   ctx.fillStyle = "#333333";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.font = "18px sans-serif";
-  ctx.fillText("每日签到", panel.x + panel.w / 2, panel.y + 36);
+  ctx.font = "30px sans-serif";
+  ctx.fillText("🎁", panel.x + panel.w / 2, panel.y + 40);
 
-  ctx.font = "16px sans-serif";
-  ctx.fillText(`+${rewardGold} 金币`, panel.x + panel.w / 2, panel.y + 76);
+  ctx.font = "18px sans-serif";
+  ctx.fillText(`+${rewardGold}💰`, panel.x + panel.w / 2, panel.y + 80);
 
   ctx.fillStyle = "#4caf50";
   ctx.fillRect(claimBtn.x, claimBtn.y, claimBtn.w, claimBtn.h);
   ctx.fillStyle = "#ffffff";
-  ctx.fillText("领取", claimBtn.x + claimBtn.w / 2, claimBtn.y + claimBtn.h / 2);
+  ctx.font = "18px sans-serif";
+  ctx.fillText("✅", claimBtn.x + claimBtn.w / 2, claimBtn.y + claimBtn.h / 2);
 }
 
 export function hitTestCheckInDialog(x: number, y: number, width: number, height: number): boolean {

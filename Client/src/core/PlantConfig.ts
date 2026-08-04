@@ -6,6 +6,7 @@ import { loadJsonConfig } from "./ConfigLoader";
 export interface PlantDef {
   id: string;
   name: string;
+  icon: string;
   buyPrice: number;
   sellPrice: number;
   matureSeconds: number;

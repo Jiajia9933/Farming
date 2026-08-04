@@ -77,25 +77,25 @@ export function drawPlantMenu(
     ctx.fillStyle = "#ffffff";
     ctx.textBaseline = "middle";
 
-    ctx.font = "16px sans-serif";
+    ctx.font = "26px sans-serif";
     ctx.textAlign = "left";
-    ctx.fillText(plant.name, row.x + 12, row.y + 18);
+    ctx.fillText(plant.icon, row.x + 12, row.y + row.h / 2);
 
     ctx.font = "12px sans-serif";
-    ctx.fillText(`成熟：${formatMatureTime(plant.matureSeconds)}`, row.x + 12, row.y + row.h - 16);
+    ctx.fillText(`⏱${formatMatureTime(plant.matureSeconds)}`, row.x + 48, row.y + row.h / 2);
 
     ctx.font = "16px sans-serif";
     ctx.textAlign = "right";
-    ctx.fillText(`${plant.buyPrice}金币`, row.x + row.w - 12, row.y + row.h / 2);
+    ctx.fillText(`💰${plant.buyPrice}`, row.x + row.w - 12, row.y + row.h / 2);
   });
 
   const cancel = layout.cancelBtn;
   ctx.fillStyle = "#aaaaaa";
   ctx.fillRect(cancel.x, cancel.y, cancel.w, cancel.h);
   ctx.fillStyle = "#ffffff";
-  ctx.font = "16px sans-serif";
+  ctx.font = "18px sans-serif";
   ctx.textAlign = "center";
-  ctx.fillText("取消", cancel.x + cancel.w / 2, cancel.y + cancel.h / 2);
+  ctx.fillText("✖️", cancel.x + cancel.w / 2, cancel.y + cancel.h / 2);
 }
 
 function formatMatureTime(seconds: number): string {

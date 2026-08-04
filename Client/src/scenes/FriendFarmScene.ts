@@ -17,7 +17,7 @@ const MOCK_LAND_STATUSES: MockStatus[] = [
   "empty", "empty", "growing", "mature", "empty",
 ];
 
-const MOCK_FRIEND_NAME = "小明的农场（示例）";
+const MOCK_FRIEND_NAME = "🧑‍🌾 小明";
 
 interface Rect {
   x: number;
@@ -86,8 +86,8 @@ export class FriendFarmScene implements Scene {
     ctx.fillStyle = "#5b8def";
     ctx.fillRect(btn.x, btn.y, btn.w, btn.h);
     ctx.fillStyle = "#ffffff";
-    ctx.font = "16px sans-serif";
-    ctx.fillText("返回地图", btn.x + btn.w / 2, btn.y + btn.h / 2);
+    ctx.font = "20px sans-serif";
+    ctx.fillText("🔙", btn.x + btn.w / 2, btn.y + btn.h / 2);
   }
 
   private drawLand(rect: Rect, status: MockStatus): void {
