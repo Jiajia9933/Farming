@@ -5,7 +5,7 @@
     "buyPrice": 20,
     "sellPrice": 30,
     "matureSeconds": 60,
-    "exp": 5
+    "exp": 10
   },
   "corn": {
     "id": "corn",
@@ -13,7 +13,7 @@
     "buyPrice": 50,
     "sellPrice": 70,
     "matureSeconds": 120,
-    "exp": 15
+    "exp": 20
   },
   "tomato": {
     "id": "tomato",
@@ -21,6 +21,6 @@
     "buyPrice": 100,
     "sellPrice": 150,
     "matureSeconds": 300,
-    "exp": 30
+    "exp": 50
   }
 }
