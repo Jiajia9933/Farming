@@ -2,7 +2,7 @@
 // 只负责绘制和触摸路由，具体数据规则都在 GameState / Land 里。
 
 import { GameState } from "../core/GameState";
-import { getPlant } from "../core/PlantConfig";
+import { getPlant, getAllPlants } from "../core/PlantConfig";
 import { drawHUD, getHudHeight } from "../ui/HUD";
 import { drawPlantMenu, hitTestPlantMenu } from "../ui/PlantMenu";
 
@@ -18,8 +18,6 @@ interface LandRect {
   w: number;
   h: number;
 }
-
-const DEFAULT_PLANT_ID = "carrot";
 
 export class HomeScene {
   private ctx: WxCanvasContext2D;
@@ -74,7 +72,7 @@ export class HomeScene {
     drawHUD(ctx, this.width, this.safeTop, this.state.gold, this.state.exp);
 
     if (this.selectedLandId !== null) {
-      drawPlantMenu(ctx, this.width, this.height, getPlant(DEFAULT_PLANT_ID));
+      drawPlantMenu(ctx, this.width, this.height, getAllPlants(), this.state.gold);
     }
   }
 
@@ -95,26 +93,24 @@ export class HomeScene {
     ctx.lineWidth = 2;
     ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
 
-    if (land.data.status === "growing" && !land.isMature(now)) {
+    if (land.data.status === "growing" && land.data.plantId !== null) {
+      const plant = getPlant(land.data.plantId);
+      const statusLine = land.isMature(now) ? "可收获" : `${land.remainingSeconds(now)}s`;
       ctx.fillStyle = "#ffffff";
       ctx.font = "14px sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText(`${land.remainingSeconds(now)}s`, rect.x + rect.w / 2, rect.y + rect.h / 2);
-    } else if (land.isMature(now)) {
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "14px sans-serif";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText("可收获", rect.x + rect.w / 2, rect.y + rect.h / 2);
+      ctx.fillText(plant.name, rect.x + rect.w / 2, rect.y + rect.h / 2 - 10);
+      ctx.fillText(statusLine, rect.x + rect.w / 2, rect.y + rect.h / 2 + 10);
     }
   }
 
   handleTouch(x: number, y: number): void {
     if (this.selectedLandId !== null) {
-      const action = hitTestPlantMenu(x, y, this.width, this.height);
-      if (action === "confirm") {
-        this.state.plantOn(this.selectedLandId, DEFAULT_PLANT_ID);
+      const plants = getAllPlants();
+      const action = hitTestPlantMenu(x, y, this.width, this.height, plants, this.state.gold);
+      if (action !== null && action.type === "plant") {
+        this.state.plantOn(this.selectedLandId, action.plantId);
       }
       if (action !== null) {
         this.selectedLandId = null;

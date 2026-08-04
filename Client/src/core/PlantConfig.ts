@@ -22,3 +22,8 @@ export function getPlant(id: string): PlantDef {
   }
   return plant;
 }
+
+/** 种植菜单要展示的作物列表，顺序与 config/plants.json 里的书写顺序一致。 */
+export function getAllPlants(): PlantDef[] {
+  return Object.values(plantData);
+}

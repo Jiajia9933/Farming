@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## 2026-08-04 — Version 0.2.0
+
+新增：
+
+- 种植菜单支持多种作物选择（胡萝卜/玉米/番茄，数值见 `Client/config/plants.json`，对应 [04_经济系统.md](04_经济系统.md)），金币不够的作物在菜单里禁用
+- 地块生长/成熟状态显示具体作物名称
+
+修复：
+
+- HUD 安全区域改用 `wx.getSystemInfoSync().statusBarHeight`，替换掉不稳定的 `getMenuButtonBoundingClientRect`
+
 ## 2026-08-04 — Version 0.1.1
 
 修复：

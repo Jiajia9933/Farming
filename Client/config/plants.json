@@ -6,5 +6,21 @@
     "sellPrice": 30,
     "matureSeconds": 300,
     "exp": 5
+  },
+  "corn": {
+    "id": "corn",
+    "name": "玉米",
+    "buyPrice": 50,
+    "sellPrice": 70,
+    "matureSeconds": 900,
+    "exp": 15
+  },
+  "tomato": {
+    "id": "tomato",
+    "name": "番茄",
+    "buyPrice": 100,
+    "sellPrice": 150,
+    "matureSeconds": 1800,
+    "exp": 30
   }
 }
