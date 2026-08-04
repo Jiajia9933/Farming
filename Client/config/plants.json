@@ -22,5 +22,21 @@
     "sellPrice": 150,
     "matureSeconds": 300,
     "exp": 50
+  },
+  "potato": {
+    "id": "potato",
+    "name": "土豆",
+    "buyPrice": 180,
+    "sellPrice": 260,
+    "matureSeconds": 480,
+    "exp": 80
+  },
+  "watermelon": {
+    "id": "watermelon",
+    "name": "西瓜",
+    "buyPrice": 300,
+    "sellPrice": 450,
+    "matureSeconds": 900,
+    "exp": 150
   }
 }
