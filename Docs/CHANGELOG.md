@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2026-08-04 — Version 0.1.1
+
+修复：
+
+- 作物配置改为通过 `wx.getFileSystemManager().readFileSync` 读取 `config/plants.json`，因为微信小游戏的 `require` 不支持直接加载 `.json` 文件
+- HUD 顶部资源栏改用 `wx.getMenuButtonBoundingClientRect()` 计算安全区域，避免被刘海屏/状态栏遮挡
+
 ## 2026-08-03 — Version 0.1.0
 
 新增：

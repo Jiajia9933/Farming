@@ -38,12 +38,28 @@ interface WxCanvas {
   getContext(type: "2d"): WxCanvasContext2D;
 }
 
+interface WxFileSystemManager {
+  readFileSync(filePath: string, encoding: string): string;
+}
+
+interface WxRect {
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+  width: number;
+  height: number;
+}
+
 interface Wx {
   getSystemInfoSync(): WxSystemInfo;
   createCanvas(): WxCanvas;
   onTouchStart(callback: (event: WxTouchEvent) => void): void;
   setStorageSync(key: string, data: unknown): void;
   getStorageSync<T = unknown>(key: string): T;
+  getFileSystemManager(): WxFileSystemManager;
+  /** 胶囊菜单按钮（右上角"..."和圆点）在屏幕上的位置，用来确定顶部安全区域。 */
+  getMenuButtonBoundingClientRect(): WxRect;
 }
 
 declare const wx: Wx;

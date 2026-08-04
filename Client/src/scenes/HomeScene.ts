@@ -3,7 +3,7 @@
 
 import { GameState } from "../core/GameState";
 import { getPlant } from "../core/PlantConfig";
-import { drawHUD, HUD_HEIGHT } from "../ui/HUD";
+import { drawHUD, getHudHeight } from "../ui/HUD";
 import { drawPlantMenu, hitTestPlantMenu } from "../ui/PlantMenu";
 
 const GRID_COLS = 5;
@@ -26,19 +26,21 @@ export class HomeScene {
   private width: number;
   private height: number;
   private state: GameState;
+  private safeTop: number;
   private landRects: LandRect[];
   private selectedLandId: number | null = null;
 
-  constructor(ctx: WxCanvasContext2D, width: number, height: number, state: GameState) {
+  constructor(ctx: WxCanvasContext2D, width: number, height: number, safeTop: number, state: GameState) {
     this.ctx = ctx;
     this.width = width;
     this.height = height;
+    this.safeTop = safeTop;
     this.state = state;
     this.landRects = this.computeLandRects();
   }
 
   private computeLandRects(): LandRect[] {
-    const gridTop = HUD_HEIGHT + GRID_MARGIN;
+    const gridTop = getHudHeight(this.safeTop) + GRID_MARGIN;
     const gridWidth = this.width - GRID_MARGIN * 2;
     const cellW = (gridWidth - CELL_GAP * (GRID_COLS - 1)) / GRID_COLS;
     const cellH = cellW;
@@ -69,7 +71,7 @@ export class HomeScene {
       this.drawLand(rect, now);
     }
 
-    drawHUD(ctx, this.width, this.state.gold, this.state.exp);
+    drawHUD(ctx, this.width, this.safeTop, this.state.gold, this.state.exp);
 
     if (this.selectedLandId !== null) {
       drawPlantMenu(ctx, this.width, this.height, getPlant(DEFAULT_PLANT_ID));
