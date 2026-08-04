@@ -1,7 +1,10 @@
 // 小游戏入口。编译后必须叫 game.js 并放在项目根目录，这是微信小游戏的硬性要求。
 
 import { GameState } from "./core/GameState";
+import { Scene } from "./scenes/Scene";
 import { HomeScene } from "./scenes/HomeScene";
+import { MapScene } from "./scenes/MapScene";
+import { FriendFarmScene } from "./scenes/FriendFarmScene";
 
 const systemInfo = wx.getSystemInfoSync();
 const canvas = wx.createCanvas();
@@ -13,20 +16,41 @@ const ctx = canvas.getContext("2d");
 const safeTop = systemInfo.statusBarHeight || 20;
 
 const state = new GameState();
-const scene = new HomeScene(ctx, canvas.width, canvas.height, safeTop, state);
 
-scene.render();
+// showHome() 在下面立刻调用一次，保证使用前一定已赋值。
+let currentScene!: Scene;
+
+function showHome(): void {
+  currentScene = new HomeScene(ctx, canvas.width, canvas.height, safeTop, state, showMap);
+}
+
+function showMap(): void {
+  currentScene = new MapScene(ctx, canvas.width, canvas.height, safeTop, (target) => {
+    if (target === "home") {
+      showHome();
+    } else {
+      showFriendFarm();
+    }
+  });
+}
+
+function showFriendFarm(): void {
+  currentScene = new FriendFarmScene(ctx, canvas.width, canvas.height, safeTop, showMap);
+}
+
+showHome();
+currentScene.render();
 
 wx.onTouchStart((event) => {
   const touch = event.touches[0];
   if (!touch) {
     return;
   }
-  scene.handleTouch(touch.clientX, touch.clientY);
-  scene.render();
+  currentScene.handleTouch(touch.clientX, touch.clientY);
+  currentScene.render();
 });
 
 // 每秒刷新一次，更新成熟倒计时显示。
 setInterval(() => {
-  scene.render();
+  currentScene.render();
 }, 1000);

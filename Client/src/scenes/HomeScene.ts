@@ -5,11 +5,13 @@ import { GameState } from "../core/GameState";
 import { getPlant, getAllPlants } from "../core/PlantConfig";
 import { drawHUD, getHudHeight } from "../ui/HUD";
 import { drawPlantMenu, hitTestPlantMenu } from "../ui/PlantMenu";
+import { Scene } from "./Scene";
 
 const GRID_COLS = 5;
 const GRID_ROWS = 2;
 const GRID_MARGIN = 16;
 const CELL_GAP = 12;
+const VISIT_BUTTON_HEIGHT = 48;
 
 interface LandRect {
   id: number;
@@ -19,22 +21,40 @@ interface LandRect {
   h: number;
 }
 
-export class HomeScene {
+interface Rect {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+export class HomeScene implements Scene {
   private ctx: WxCanvasContext2D;
   private width: number;
   private height: number;
   private state: GameState;
   private safeTop: number;
+  private onVisitFriends: () => void;
   private landRects: LandRect[];
+  private visitButton: Rect;
   private selectedLandId: number | null = null;
 
-  constructor(ctx: WxCanvasContext2D, width: number, height: number, safeTop: number, state: GameState) {
+  constructor(
+    ctx: WxCanvasContext2D,
+    width: number,
+    height: number,
+    safeTop: number,
+    state: GameState,
+    onVisitFriends: () => void
+  ) {
     this.ctx = ctx;
     this.width = width;
     this.height = height;
     this.safeTop = safeTop;
     this.state = state;
+    this.onVisitFriends = onVisitFriends;
     this.landRects = this.computeLandRects();
+    this.visitButton = this.computeVisitButton();
   }
 
   private computeLandRects(): LandRect[] {
@@ -58,6 +78,16 @@ export class HomeScene {
     return rects;
   }
 
+  private computeVisitButton(): Rect {
+    const lastRow = this.landRects[this.landRects.length - 1];
+    return {
+      x: GRID_MARGIN,
+      y: lastRow.y + lastRow.h + GRID_MARGIN,
+      w: this.width - GRID_MARGIN * 2,
+      h: VISIT_BUTTON_HEIGHT,
+    };
+  }
+
   render(): void {
     const ctx = this.ctx;
     const now = Date.now();
@@ -70,10 +100,23 @@ export class HomeScene {
     }
 
     drawHUD(ctx, this.width, this.safeTop, this.state.gold, this.state.exp);
+    this.drawVisitButton();
 
     if (this.selectedLandId !== null) {
       drawPlantMenu(ctx, this.width, this.height, getAllPlants(), this.state.gold);
     }
+  }
+
+  private drawVisitButton(): void {
+    const ctx = this.ctx;
+    const btn = this.visitButton;
+    ctx.fillStyle = "#5b8def";
+    ctx.fillRect(btn.x, btn.y, btn.w, btn.h);
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "16px sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("拜访好友", btn.x + btn.w / 2, btn.y + btn.h / 2);
   }
 
   private drawLand(rect: LandRect, now: number): void {
@@ -115,6 +158,12 @@ export class HomeScene {
       if (action !== null) {
         this.selectedLandId = null;
       }
+      return;
+    }
+
+    const btn = this.visitButton;
+    if (x >= btn.x && x <= btn.x + btn.w && y >= btn.y && y <= btn.y + btn.h) {
+      this.onVisitFriends();
       return;
     }
 
