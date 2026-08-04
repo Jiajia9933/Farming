@@ -8,14 +8,19 @@ import { drawHUD, getHudHeight } from "../ui/HUD";
 import { drawPlantMenu, hitTestPlantMenu } from "../ui/PlantMenu";
 import { drawCheckInDialog, hitTestCheckInDialog } from "../ui/CheckInDialog";
 import { drawSoil, drawMatureHighlight, drawPlainBorder } from "../ui/LandTile";
+import { drawGrassBackground, drawSkyBand, drawFence } from "../ui/Scenery";
 import { Scene } from "./Scene";
 
 const GRID_COLS = 5;
 const GRID_ROWS = 2;
 const GRID_MARGIN = 16;
-const CELL_GAP = 12;
+const CELL_GAP = 0;
 const BOTTOM_BUTTON_HEIGHT = 48;
 const BOTTOM_BUTTON_GAP = 12;
+const SKY_HEIGHT = 64;
+const FENCE_GAP_ABOVE_SKY = 16;
+const FENCE_POST_CLEARANCE = 15;
+const FENCE_INSET = 12;
 
 interface LandRect {
   id: number;
@@ -41,6 +46,7 @@ export class HomeScene implements Scene {
   private onVisitFriends: () => void;
   private onOpenWarehouse: () => void;
   private landRects: LandRect[];
+  private fenceRect: Rect;
   private visitButton: Rect;
   private warehouseButton: Rect;
   private selectedLandId: number | null = null;
@@ -63,6 +69,7 @@ export class HomeScene implements Scene {
     this.onVisitFriends = onVisitFriends;
     this.onOpenWarehouse = onOpenWarehouse;
     this.landRects = this.computeLandRects();
+    this.fenceRect = this.computeFenceRect();
     const bottomButtons = this.computeBottomButtons();
     this.visitButton = bottomButtons.visitButton;
     this.warehouseButton = bottomButtons.warehouseButton;
@@ -70,7 +77,8 @@ export class HomeScene implements Scene {
   }
 
   private computeLandRects(): LandRect[] {
-    const gridTop = getHudHeight(this.safeTop) + GRID_MARGIN;
+    const skyBottom = getHudHeight(this.safeTop) + SKY_HEIGHT;
+    const gridTop = skyBottom + FENCE_GAP_ABOVE_SKY + FENCE_POST_CLEARANCE + FENCE_INSET;
     const gridWidth = this.width - GRID_MARGIN * 2;
     const cellW = (gridWidth - CELL_GAP * (GRID_COLS - 1)) / GRID_COLS;
     const cellH = cellW;
@@ -90,6 +98,17 @@ export class HomeScene implements Scene {
     return rects;
   }
 
+  private computeFenceRect(): Rect {
+    const first = this.landRects[0];
+    const last = this.landRects[this.landRects.length - 1];
+    return {
+      x: first.x - FENCE_INSET,
+      y: first.y - FENCE_INSET,
+      w: last.x + last.w - first.x + FENCE_INSET * 2,
+      h: last.y + last.h - first.y + FENCE_INSET * 2,
+    };
+  }
+
   private computeBottomButtons(): { visitButton: Rect; warehouseButton: Rect } {
     const lastRow = this.landRects[this.landRects.length - 1];
     const y = lastRow.y + lastRow.h + GRID_MARGIN;
@@ -105,8 +124,9 @@ export class HomeScene implements Scene {
     const ctx = this.ctx;
     const now = Date.now();
 
-    ctx.fillStyle = "#eef7ee";
-    ctx.fillRect(0, 0, this.width, this.height);
+    drawGrassBackground(ctx, this.width, this.height);
+    drawSkyBand(ctx, this.width, getHudHeight(this.safeTop), SKY_HEIGHT);
+    drawFence(ctx, this.fenceRect);
 
     for (const rect of this.landRects) {
       this.drawLand(rect, now);

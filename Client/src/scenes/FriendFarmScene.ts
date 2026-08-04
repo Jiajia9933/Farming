@@ -3,13 +3,18 @@
 // 场景本身和 game.ts 里的切换逻辑不用改。
 
 import { drawSoil, drawMatureHighlight, drawPlainBorder } from "../ui/LandTile";
+import { drawGrassBackground, drawSkyBand, drawFence } from "../ui/Scenery";
 import { Scene } from "./Scene";
 
 const GRID_COLS = 5;
 const GRID_ROWS = 2;
 const GRID_MARGIN = 16;
-const CELL_GAP = 12;
+const CELL_GAP = 0;
 const BACK_BUTTON_HEIGHT = 48;
+const SKY_HEIGHT = 64;
+const FENCE_GAP_ABOVE_SKY = 16;
+const FENCE_POST_CLEARANCE = 15;
+const FENCE_INSET = 12;
 
 type MockStatus = "empty" | "growing" | "mature";
 
@@ -34,6 +39,7 @@ export class FriendFarmScene implements Scene {
   private safeTop: number;
   private onBack: () => void;
   private landRects: Rect[];
+  private fenceRect: Rect;
   private backButton: Rect;
 
   constructor(ctx: WxCanvasContext2D, width: number, height: number, safeTop: number, onBack: () => void) {
@@ -43,6 +49,7 @@ export class FriendFarmScene implements Scene {
     this.safeTop = safeTop;
     this.onBack = onBack;
     this.landRects = this.computeLandRects();
+    this.fenceRect = this.computeFenceRect();
     this.backButton = {
       x: GRID_MARGIN,
       y: height - GRID_MARGIN - BACK_BUTTON_HEIGHT,
@@ -52,7 +59,8 @@ export class FriendFarmScene implements Scene {
   }
 
   private computeLandRects(): Rect[] {
-    const gridTop = this.safeTop + 60;
+    const skyBottom = this.safeTop + SKY_HEIGHT;
+    const gridTop = skyBottom + FENCE_GAP_ABOVE_SKY + FENCE_POST_CLEARANCE + FENCE_INSET;
     const gridWidth = this.width - GRID_MARGIN * 2;
     const cellW = (gridWidth - CELL_GAP * (GRID_COLS - 1)) / GRID_COLS;
     const rects: Rect[] = [];
@@ -69,17 +77,29 @@ export class FriendFarmScene implements Scene {
     return rects;
   }
 
+  private computeFenceRect(): Rect {
+    const first = this.landRects[0];
+    const last = this.landRects[this.landRects.length - 1];
+    return {
+      x: first.x - FENCE_INSET,
+      y: first.y - FENCE_INSET,
+      w: last.x + last.w - first.x + FENCE_INSET * 2,
+      h: last.y + last.h - first.y + FENCE_INSET * 2,
+    };
+  }
+
   render(): void {
     const ctx = this.ctx;
 
-    ctx.fillStyle = "#eef7ee";
-    ctx.fillRect(0, 0, this.width, this.height);
+    drawGrassBackground(ctx, this.width, this.height);
+    drawSkyBand(ctx, this.width, this.safeTop, SKY_HEIGHT);
+    drawFence(ctx, this.fenceRect);
 
     ctx.fillStyle = "#333333";
     ctx.font = "18px sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(MOCK_FRIEND_NAME, this.width / 2, this.safeTop + 26);
+    ctx.fillText(MOCK_FRIEND_NAME, this.width / 2, this.safeTop + 20);
 
     this.landRects.forEach((rect, i) => this.drawLand(rect, MOCK_LAND_STATUSES[i], i));
 
