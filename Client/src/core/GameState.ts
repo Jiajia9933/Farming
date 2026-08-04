@@ -5,6 +5,7 @@ import { loadSave, writeSave } from "./SaveManager";
 import { getPlant } from "./PlantConfig";
 import { getCheckInRewardGold } from "./CheckInConfig";
 import { getFlatGoldPerHarvest } from "./HarvestConfig";
+import { getOrderForDate, OrderTemplate } from "./OrderConfig";
 import {
   getStartingWarehouseLevel,
   getWarehouseCapacity as calcWarehouseCapacity,
@@ -22,6 +23,7 @@ interface SaveData {
   lastCheckInDate: string | null;
   inventory: Record<string, number>;
   warehouseLevel: number;
+  lastOrderCompletedDate: string | null;
 }
 
 function createDefaultSave(): SaveData {
@@ -36,6 +38,7 @@ function createDefaultSave(): SaveData {
     lastCheckInDate: null,
     inventory: {},
     warehouseLevel: getStartingWarehouseLevel(),
+    lastOrderCompletedDate: null,
   };
 }
 
@@ -52,6 +55,7 @@ export class GameState {
   inventory: Record<string, number>;
   warehouseLevel: number;
   private lastCheckInDate: string | null;
+  private lastOrderCompletedDate: string | null;
 
   constructor() {
     const save = loadSave(createDefaultSave());
@@ -61,6 +65,7 @@ export class GameState {
     this.lastCheckInDate = save.lastCheckInDate;
     this.inventory = save.inventory;
     this.warehouseLevel = save.warehouseLevel;
+    this.lastOrderCompletedDate = save.lastOrderCompletedDate;
   }
 
   private save(): void {
@@ -71,6 +76,7 @@ export class GameState {
       lastCheckInDate: this.lastCheckInDate,
       inventory: this.inventory,
       warehouseLevel: this.warehouseLevel,
+      lastOrderCompletedDate: this.lastOrderCompletedDate,
     };
     writeSave(data);
   }
@@ -109,6 +115,35 @@ export class GameState {
     this.gold += totalGold;
     this.save();
     return totalGold;
+  }
+
+  /** 今天的订单，同一天固定不变。 */
+  getTodayOrder(): OrderTemplate {
+    return getOrderForDate(todayString());
+  }
+
+  canCompleteOrderToday(): boolean {
+    return this.lastOrderCompletedDate !== todayString();
+  }
+
+  hasEnoughForOrder(order: OrderTemplate): boolean {
+    return order.requirements.every((r) => (this.inventory[r.plantId] || 0) >= r.count);
+  }
+
+  /** 交今天的订单：扣仓库里对应的作物，换金币和经验。今天交过或库存不够就返回 false，不做任何改动。 */
+  completeOrder(): boolean {
+    const order = this.getTodayOrder();
+    if (!this.canCompleteOrderToday() || !this.hasEnoughForOrder(order)) {
+      return false;
+    }
+    for (const r of order.requirements) {
+      this.inventory[r.plantId] -= r.count;
+    }
+    this.gold += order.rewardGold;
+    this.exp += order.rewardExp;
+    this.lastOrderCompletedDate = todayString();
+    this.save();
+    return true;
   }
 
   canCheckInToday(): boolean {

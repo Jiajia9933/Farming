@@ -2,13 +2,15 @@
 // 还没有真正的商店，"全部卖出"是过渡方案——见 Docs/06_建筑系统.md。
 
 import { GameState } from "../core/GameState";
-import { getAllPlants } from "../core/PlantConfig";
+import { getPlant, getAllPlants } from "../core/PlantConfig";
 import { Scene } from "./Scene";
 
 const GRID_MARGIN = 16;
 const ROW_HEIGHT = 40;
 const BUTTON_HEIGHT = 48;
 const BUTTON_GAP = 12;
+const ORDER_SECTION_TOP = 300;
+const ORDER_BUTTON_HEIGHT = 40;
 
 interface Rect {
   x: number;
@@ -27,6 +29,7 @@ export class WarehouseScene implements Scene {
   private upgradeButton: Rect;
   private sellAllButton: Rect;
   private backButton: Rect;
+  private submitOrderButton: Rect;
 
   constructor(ctx: WxCanvasContext2D, width: number, height: number, safeTop: number, state: GameState, onBack: () => void) {
     this.ctx = ctx;
@@ -43,6 +46,12 @@ export class WarehouseScene implements Scene {
     this.upgradeButton = { x: GRID_MARGIN, y: upgradeY, w: btnWidth, h: BUTTON_HEIGHT };
     this.sellAllButton = { x: GRID_MARGIN, y: sellY, w: btnWidth, h: BUTTON_HEIGHT };
     this.backButton = { x: GRID_MARGIN, y: backY, w: btnWidth, h: BUTTON_HEIGHT };
+    this.submitOrderButton = {
+      x: GRID_MARGIN,
+      y: safeTop + ORDER_SECTION_TOP + 60,
+      w: btnWidth,
+      h: ORDER_BUTTON_HEIGHT,
+    };
   }
 
   render(): void {
@@ -63,6 +72,7 @@ export class WarehouseScene implements Scene {
     ctx.fillText(`容量 ${used} / ${capacity}`, this.width / 2, this.safeTop + 50);
 
     this.drawInventoryList();
+    this.drawTodayOrder();
     this.drawUpgradeButton();
     this.drawSellAllButton();
     this.drawBackButton();
@@ -86,6 +96,37 @@ export class WarehouseScene implements Scene {
       ctx.textAlign = "left";
       y += ROW_HEIGHT;
     });
+  }
+
+  private drawTodayOrder(): void {
+    const ctx = this.ctx;
+    const order = this.state.getTodayOrder();
+    const requirementText = order.requirements
+      .map((r) => `${getPlant(r.plantId).name}x${r.count}`)
+      .join(" + ");
+    const top = this.safeTop + ORDER_SECTION_TOP;
+
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "#333333";
+    ctx.font = "16px sans-serif";
+    ctx.fillText("今日订单", GRID_MARGIN, top);
+    ctx.font = "14px sans-serif";
+    ctx.fillText(`需要：${requirementText}`, GRID_MARGIN, top + 22);
+    ctx.fillText(`奖励：${order.rewardGold}金币 / ${order.rewardExp}经验`, GRID_MARGIN, top + 42);
+
+    const btn = this.submitOrderButton;
+    const completedToday = !this.state.canCompleteOrderToday();
+    const enoughStock = this.state.hasEnoughForOrder(order);
+
+    ctx.fillStyle = completedToday ? "#cccccc" : enoughStock ? "#4caf50" : "#cccccc";
+    ctx.fillRect(btn.x, btn.y, btn.w, btn.h);
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "16px sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    const label = completedToday ? "今日已完成" : enoughStock ? "交订单" : "库存不足";
+    ctx.fillText(label, btn.x + btn.w / 2, btn.y + btn.h / 2);
   }
 
   private drawUpgradeButton(): void {
@@ -135,6 +176,10 @@ export class WarehouseScene implements Scene {
   }
 
   handleTouch(x: number, y: number): void {
+    if (this.isInside(x, y, this.submitOrderButton)) {
+      this.state.completeOrder();
+      return;
+    }
     if (this.isInside(x, y, this.upgradeButton)) {
       this.state.upgradeWarehouse();
       return;

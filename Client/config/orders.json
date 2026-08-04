@@ -1,0 +1,28 @@
+[
+  {
+    "requirements": [{ "plantId": "carrot", "count": 5 }],
+    "rewardGold": 225,
+    "rewardExp": 75
+  },
+  {
+    "requirements": [
+      { "plantId": "corn", "count": 3 },
+      { "plantId": "tomato", "count": 2 }
+    ],
+    "rewardGold": 765,
+    "rewardExp": 240
+  },
+  {
+    "requirements": [{ "plantId": "tomato", "count": 3 }],
+    "rewardGold": 675,
+    "rewardExp": 225
+  },
+  {
+    "requirements": [
+      { "plantId": "potato", "count": 2 },
+      { "plantId": "watermelon", "count": 1 }
+    ],
+    "rewardGold": 1455,
+    "rewardExp": 465
+  }
+]
