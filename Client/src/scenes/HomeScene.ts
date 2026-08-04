@@ -7,6 +7,7 @@ import { getCheckInRewardGold } from "../core/CheckInConfig";
 import { drawHUD, getHudHeight } from "../ui/HUD";
 import { drawPlantMenu, hitTestPlantMenu } from "../ui/PlantMenu";
 import { drawCheckInDialog, hitTestCheckInDialog } from "../ui/CheckInDialog";
+import { drawSoil, drawMatureHighlight, drawPlainBorder } from "../ui/LandTile";
 import { Scene } from "./Scene";
 
 const GRID_COLS = 5;
@@ -151,26 +152,43 @@ export class HomeScene implements Scene {
   private drawLand(rect: LandRect, now: number): void {
     const ctx = this.ctx;
     const land = this.state.lands[rect.id];
-    const mature = land.data.status === "growing" && land.isMature(now);
+    const isGrowing = land.data.status === "growing" && land.data.plantId !== null;
+    const stage = isGrowing ? land.getGrowthStage(now) : null;
 
-    // 不管种的什么、成不成熟，土地背景都用统一的土色，
-    // 避免作物图标的颜色（比如橙色的胡萝卜）跟背景色撞在一起看不清。
-    ctx.fillStyle = land.data.status === "empty" ? "#8b5a2b" : "#6b4a2f";
-    ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+    drawSoil(ctx, rect, rect.id, isGrowing);
 
-    ctx.strokeStyle = mature ? "#ffd54f" : "#3c3c3c";
-    ctx.lineWidth = mature ? 4 : 2;
-    ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
+    if (stage === "mature") {
+      drawMatureHighlight(ctx, rect);
+    } else {
+      drawPlainBorder(ctx, rect);
+    }
 
-    if (land.data.status === "growing" && land.data.plantId !== null) {
-      const plant = getPlant(land.data.plantId);
+    if (isGrowing && stage !== null) {
+      const plant = getPlant(land.data.plantId as string);
+      let icon: string;
+      let iconSize: number;
+      if (stage === "sprout") {
+        icon = "🌱";
+        iconSize = 16;
+      } else if (stage === "growing") {
+        icon = "🌿";
+        iconSize = 22;
+      } else {
+        icon = plant.icon;
+        iconSize = 28;
+      }
+
       ctx.fillStyle = "#ffffff";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.font = "26px sans-serif";
-      ctx.fillText(plant.icon, rect.x + rect.w / 2, rect.y + rect.h / 2 - 10);
+      ctx.font = `${iconSize}px sans-serif`;
+      ctx.fillText(icon, rect.x + rect.w / 2, rect.y + rect.h / 2 - 10);
       ctx.font = "14px sans-serif";
-      ctx.fillText(mature ? "可收获" : `${land.remainingSeconds(now)}s`, rect.x + rect.w / 2, rect.y + rect.h / 2 + 16);
+      ctx.fillText(
+        stage === "mature" ? "可收获" : `${land.remainingSeconds(now)}s`,
+        rect.x + rect.w / 2,
+        rect.y + rect.h / 2 + 16
+      );
     }
   }
 

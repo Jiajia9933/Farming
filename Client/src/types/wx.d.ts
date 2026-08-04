@@ -31,6 +31,9 @@ interface WxCanvasContext2D {
   beginPath(): void;
   arc(x: number, y: number, radius: number, startAngle: number, endAngle: number): void;
   fill(): void;
+  moveTo(x: number, y: number): void;
+  lineTo(x: number, y: number): void;
+  stroke(): void;
 }
 
 interface WxCanvas {

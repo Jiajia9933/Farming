@@ -2,6 +2,7 @@
 // 等好友关系和服务器数据就绪后，把 MOCK_LAND_STATUSES 换成真实好友的数据即可，
 // 场景本身和 game.ts 里的切换逻辑不用改。
 
+import { drawSoil, drawMatureHighlight, drawPlainBorder } from "../ui/LandTile";
 import { Scene } from "./Scene";
 
 const GRID_COLS = 5;
@@ -80,7 +81,7 @@ export class FriendFarmScene implements Scene {
     ctx.textBaseline = "middle";
     ctx.fillText(MOCK_FRIEND_NAME, this.width / 2, this.safeTop + 26);
 
-    this.landRects.forEach((rect, i) => this.drawLand(rect, MOCK_LAND_STATUSES[i]));
+    this.landRects.forEach((rect, i) => this.drawLand(rect, MOCK_LAND_STATUSES[i], i));
 
     const btn = this.backButton;
     ctx.fillStyle = "#5b8def";
@@ -90,19 +91,23 @@ export class FriendFarmScene implements Scene {
     ctx.fillText("返回地图", btn.x + btn.w / 2, btn.y + btn.h / 2);
   }
 
-  private drawLand(rect: Rect, status: MockStatus): void {
+  private drawLand(rect: Rect, status: MockStatus, seed: number): void {
     const ctx = this.ctx;
-    if (status === "empty") {
-      ctx.fillStyle = "#8b5a2b";
-    } else if (status === "mature") {
-      ctx.fillStyle = "#e07b39";
+    drawSoil(ctx, rect, seed, status !== "empty");
+
+    if (status === "mature") {
+      drawMatureHighlight(ctx, rect);
     } else {
-      ctx.fillStyle = "#5fa85f";
+      drawPlainBorder(ctx, rect);
     }
-    ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
-    ctx.strokeStyle = "#3c3c3c";
-    ctx.lineWidth = 2;
-    ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
+
+    if (status !== "empty") {
+      ctx.fillStyle = "#ffffff";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.font = status === "mature" ? "28px sans-serif" : "22px sans-serif";
+      ctx.fillText(status === "mature" ? "🌾" : "🌿", rect.x + rect.w / 2, rect.y + rect.h / 2);
+    }
   }
 
   handleTouch(x: number, y: number): void {
