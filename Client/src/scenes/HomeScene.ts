@@ -7,6 +7,7 @@ import { getCheckInRewardGold } from "../core/CheckInConfig";
 import { drawHUD, getHudHeight } from "../ui/HUD";
 import { drawPlantMenu, hitTestPlantMenu } from "../ui/PlantMenu";
 import { drawCheckInDialog, hitTestCheckInDialog } from "../ui/CheckInDialog";
+import { drawConfirmDialog, hitTestConfirmDialog } from "../ui/ConfirmDialog";
 import { drawSoil, drawMatureHighlight, drawPlainBorder } from "../ui/LandTile";
 import { drawGrassBackground, drawSkyBand, drawFence } from "../ui/Scenery";
 import { FlyingParticle, createParticle, isParticleAlive, drawParticle } from "../ui/Particles";
@@ -55,6 +56,7 @@ export class HomeScene implements Scene {
   /** 点了哪块生长中（未成熟）的地，要在上面显示作物名字；再点一下换回倒计时。 */
   private infoLandId: number | null = null;
   private showCheckIn: boolean;
+  private showWarehouseFullPrompt = false;
   private particles: FlyingParticle[] = [];
 
   constructor(
@@ -149,6 +151,10 @@ export class HomeScene implements Scene {
       drawCheckInDialog(ctx, this.width, this.height, getCheckInRewardGold());
     }
 
+    if (this.showWarehouseFullPrompt) {
+      drawConfirmDialog(ctx, this.width, this.height, "仓库满了，是否升级？", "去升级", "取消");
+    }
+
     this.particles = this.particles.filter((p) => isParticleAlive(p, now));
     this.particles.forEach((p) => drawParticle(ctx, p, now));
   }
@@ -157,7 +163,7 @@ export class HomeScene implements Scene {
     const centerX = rect.x + rect.w / 2;
     const centerY = rect.y + rect.h / 2;
     const hudTextY = (this.safeTop + getHudHeight(this.safeTop)) / 2;
-    this.particles.push(createParticle("⭐", centerX, centerY, 30, hudTextY));
+    this.particles.push(createParticle("💰", centerX, centerY, 30, hudTextY));
     this.particles.push(createParticle("⭐", centerX, centerY, this.width / 2 + 20, hudTextY));
     playHarvestSound();
   }
@@ -240,6 +246,17 @@ export class HomeScene implements Scene {
       return;
     }
 
+    if (this.showWarehouseFullPrompt) {
+      const action = hitTestConfirmDialog(x, y, this.width, this.height);
+      if (action === "confirm") {
+        this.showWarehouseFullPrompt = false;
+        this.onOpenWarehouse();
+      } else if (action === "cancel") {
+        this.showWarehouseFullPrompt = false;
+      }
+      return;
+    }
+
     if (this.selectedLandId !== null) {
       const plants = getAllPlants();
       const action = hitTestPlantMenu(x, y, this.width, this.height, plants, this.state.gold, this.state.getLevel());
@@ -284,6 +301,9 @@ export class HomeScene implements Scene {
       this.infoLandId = null;
       if (this.state.harvest(rect.id)) {
         this.spawnHarvestEffects(rect);
+      } else {
+        // 唯一会在"已成熟"情况下收获失败的原因就是仓库满了。
+        this.showWarehouseFullPrompt = true;
       }
     } else {
       // 生长中但还没成熟：点一下看名字，再点一下换回倒计时。
