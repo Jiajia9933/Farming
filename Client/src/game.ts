@@ -55,7 +55,9 @@ wx.onTouchStart((event) => {
   currentScene.render();
 });
 
-// 每秒刷新一次，更新成熟倒计时显示。
-setInterval(() => {
+// 每帧刷新一次：既能更新倒计时，也能让收获时的飞行特效动画连贯。
+function loop(): void {
   currentScene.render();
-}, 1000);
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);

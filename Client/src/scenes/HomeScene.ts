@@ -9,6 +9,8 @@ import { drawPlantMenu, hitTestPlantMenu } from "../ui/PlantMenu";
 import { drawCheckInDialog, hitTestCheckInDialog } from "../ui/CheckInDialog";
 import { drawSoil, drawMatureHighlight, drawPlainBorder } from "../ui/LandTile";
 import { drawGrassBackground, drawSkyBand, drawFence } from "../ui/Scenery";
+import { FlyingParticle, createParticle, isParticleAlive, drawParticle } from "../ui/Particles";
+import { playHarvestSound } from "../core/SoundManager";
 import { Scene } from "./Scene";
 
 const GRID_COLS = 5;
@@ -53,6 +55,7 @@ export class HomeScene implements Scene {
   /** 点了哪块生长中（未成熟）的地，要在上面显示作物名字；再点一下换回倒计时。 */
   private infoLandId: number | null = null;
   private showCheckIn: boolean;
+  private particles: FlyingParticle[] = [];
 
   constructor(
     ctx: WxCanvasContext2D,
@@ -145,6 +148,18 @@ export class HomeScene implements Scene {
     if (this.showCheckIn) {
       drawCheckInDialog(ctx, this.width, this.height, getCheckInRewardGold());
     }
+
+    this.particles = this.particles.filter((p) => isParticleAlive(p, now));
+    this.particles.forEach((p) => drawParticle(ctx, p, now));
+  }
+
+  private spawnHarvestEffects(rect: LandRect): void {
+    const centerX = rect.x + rect.w / 2;
+    const centerY = rect.y + rect.h / 2;
+    const hudTextY = (this.safeTop + getHudHeight(this.safeTop)) / 2;
+    this.particles.push(createParticle("⭐", centerX, centerY, 30, hudTextY));
+    this.particles.push(createParticle("⭐", centerX, centerY, this.width / 2 + 20, hudTextY));
+    playHarvestSound();
   }
 
   private drawVisitButton(): void {
@@ -267,7 +282,9 @@ export class HomeScene implements Scene {
       this.selectedLandId = rect.id;
     } else if (land.isMature(now)) {
       this.infoLandId = null;
-      this.state.harvest(rect.id);
+      if (this.state.harvest(rect.id)) {
+        this.spawnHarvestEffects(rect);
+      }
     } else {
       // 生长中但还没成熟：点一下看名字，再点一下换回倒计时。
       this.infoLandId = this.infoLandId === rect.id ? null : rect.id;

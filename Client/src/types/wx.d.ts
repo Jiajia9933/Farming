@@ -24,6 +24,7 @@ interface WxCanvasContext2D {
   font: string;
   textAlign: string;
   textBaseline: string;
+  globalAlpha: number;
   fillRect(x: number, y: number, w: number, h: number): void;
   strokeRect(x: number, y: number, w: number, h: number): void;
   clearRect(x: number, y: number, w: number, h: number): void;
@@ -46,6 +47,13 @@ interface WxFileSystemManager {
   readFileSync(filePath: string, encoding: string): string;
 }
 
+interface WxInnerAudioContext {
+  src: string;
+  play(): void;
+  stop(): void;
+  onError(callback: (err: unknown) => void): void;
+}
+
 interface Wx {
   getSystemInfoSync(): WxSystemInfo;
   createCanvas(): WxCanvas;
@@ -53,7 +61,10 @@ interface Wx {
   setStorageSync(key: string, data: unknown): void;
   getStorageSync<T = unknown>(key: string): T;
   getFileSystemManager(): WxFileSystemManager;
+  createInnerAudioContext(): WxInnerAudioContext;
 }
 
 declare const wx: Wx;
 declare function require(path: string): any;
+declare function requestAnimationFrame(callback: (time: number) => void): number;
+declare function cancelAnimationFrame(id: number): void;

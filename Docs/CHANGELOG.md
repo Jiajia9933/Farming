@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 2026-08-05 — Version 0.9.0
+
+新增：
+
+- 收获成功瞬间的反馈：两颗⭐从地块飞向金币/经验位置（`Client/src/ui/Particles.ts`），同时尝试播放音效（`Client/src/core/SoundManager.ts`）
+- 渲染循环从每秒刷新一次改成每帧刷新（`requestAnimationFrame`），飞行动画才能连贯，倒计时也更新得更及时
+- 新建 `Client/assets/audio/` 作为音频素材的实际存放位置（部署包内，不是仓库根目录的 `Assets/`），目前没有真实音效文件，代码已接好、文件缺失时安静地不报错
+
+修复文档：
+
+- [11_技术架构.md](11_技术架构.md) / [10_美术规范.md](10_美术规范.md) 更正素材存放位置说明——`Assets/` 在部署包外面，运行时读不到，真正能用的素材要放 `Client/assets/`
+
 ## 2026-08-04 — Version 0.8.2
 
 新增：
