@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2026-08-05 — Version 0.9.2
+
+调整：
+
+- "全部卖出"的结果提示改成自动消失的浮层：显示2秒后渐渐淡出，不用点"确定"，也不挡住其他操作
+- 新增通用组件 `Client/src/ui/Toast.ts`，删掉了不再用的 `ResultDialog.ts`（需要点确认的弹窗场景用 `ConfirmDialog.ts`，一次性提示用 `Toast.ts`）
+
 ## 2026-08-05 — Version 0.9.1
 
 调整：

@@ -3,7 +3,7 @@
 
 import { GameState } from "../core/GameState";
 import { getPlant, getAllPlants } from "../core/PlantConfig";
-import { drawResultDialog, hitTestResultDialog } from "../ui/ResultDialog";
+import { Toast, createToast, isToastAlive, drawToast } from "../ui/Toast";
 import { Scene } from "./Scene";
 
 const GRID_MARGIN = 16;
@@ -31,7 +31,7 @@ export class WarehouseScene implements Scene {
   private sellAllButton: Rect;
   private backButton: Rect;
   private submitOrderButton: Rect;
-  private sellResultGold: number | null = null;
+  private sellToast: Toast | null = null;
 
   constructor(ctx: WxCanvasContext2D, width: number, height: number, safeTop: number, state: GameState, onBack: () => void) {
     this.ctx = ctx;
@@ -58,6 +58,7 @@ export class WarehouseScene implements Scene {
 
   render(): void {
     const ctx = this.ctx;
+    const now = Date.now();
 
     ctx.fillStyle = "#eef7ee";
     ctx.fillRect(0, 0, this.width, this.height);
@@ -79,8 +80,12 @@ export class WarehouseScene implements Scene {
     this.drawSellAllButton();
     this.drawBackButton();
 
-    if (this.sellResultGold !== null) {
-      drawResultDialog(ctx, this.width, this.height, `卖出成功 +${this.sellResultGold}金币`);
+    if (this.sellToast !== null) {
+      if (isToastAlive(this.sellToast, now)) {
+        drawToast(ctx, this.width, this.sellToast, now);
+      } else {
+        this.sellToast = null;
+      }
     }
   }
 
@@ -184,13 +189,6 @@ export class WarehouseScene implements Scene {
   }
 
   handleTouch(x: number, y: number): void {
-    if (this.sellResultGold !== null) {
-      if (hitTestResultDialog(x, y, this.width, this.height)) {
-        this.sellResultGold = null;
-      }
-      return;
-    }
-
     if (this.isInside(x, y, this.submitOrderButton)) {
       this.state.completeOrder();
       return;
@@ -200,7 +198,8 @@ export class WarehouseScene implements Scene {
       return;
     }
     if (this.isInside(x, y, this.sellAllButton) && this.state.getWarehouseUsed() > 0) {
-      this.sellResultGold = this.state.sellAllInventory();
+      const gold = this.state.sellAllInventory();
+      this.sellToast = createToast(`卖出成功 +${gold}金币`);
       return;
     }
     if (this.isInside(x, y, this.backButton)) {
